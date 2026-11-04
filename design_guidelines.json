@@ -1,0 +1,125 @@
+{
+  "typography": {
+    "primary": {
+      "family": "Unbounded, sans-serif",
+      "weights": ["700", "900"],
+      "usage": "Logo only. Bold, wide display style."
+    },
+    "secondary": {
+      "family": "Space Mono, monospace",
+      "weights": ["400", "700"],
+      "usage": "All UI, HUD text, manifesto, labels, overlays, and captions."
+    },
+    "rules": [
+      "Strictly only these two fonts.",
+      "All HUD text should use tight tracking or standard monospace layout.",
+      "UI text is dark slate (#1B2330) on light world backgrounds.",
+      "Overlays and labels must have bracketed corners e.g., [ CLOSE ]."
+    ]
+  },
+  "colors": {
+    "world": {
+      "background_light": "#E9EDF2",
+      "background_dark": "#C9D1DA",
+      "fog": "#DFE4EA",
+      "shadows": "#A3B1C6",
+      "white": "#FFFFFF"
+    },
+    "ui": {
+      "text": "#1B2330",
+      "text_inverse": "#FFFFFF",
+      "lines": "rgba(27, 35, 48, 0.2)"
+    },
+    "accents": {
+      "blue_lagoon": "#2E8BFF",
+      "raspberry_rush": "#E91E5A"
+    },
+    "rules": [
+      "NO DARK MODE. NO BLACK BACKGROUNDS.",
+      "Shadows are soft cool grey, never black.",
+      "Accent color per flavor appears ONLY in the liquid, the drops, and small UI details. The rest of the world stays pale grey-white."
+    ]
+  },
+  "visual enhancers": {
+    "glass_shader": "Use @react-three/drei <MeshTransmissionMaterial> for the 3D bottle and ingredient drops. High transmission, low roughness, subtle chromatic aberration.",
+    "post_processing": "Use @react-three/postprocessing. Add Bloom (soft, on bright areas), Noise (subtle film grain, opacity 0.05), Vignette (gentle, white/light-grey instead of black), and DepthOfField (blur on far mountains).",
+    "hud_styling": "Technical minimalist HUD. 1px solid lines (#1B2330 with 20% opacity), thin leader lines for 3D annotations, bracketed corners for buttons. Mix-blend-mode: multiply for dark text to sit perfectly on light backgrounds.",
+    "loader": "Pixel-style loader on a flat pale-grey (#E9EDF2) screen."
+  },
+  "component name": "KlyrExperience",
+  "grids": {
+    "hud_grid": "Absolute positioning over the fullscreen canvas. Split into 4 corners: Top-Left (Logo), Top-Right (Manifesto), Bottom-Left (Scroll + Sound), Bottom-Right (Counter/Controls).",
+    "overlay_layout": "Centered or off-centered modal with 1px border, backdrop blur, padding p-8 or p-12, left-aligned monospace text."
+  },
+  "layouts": {
+    "general": "Zero template conventions: no navbar, no hero button, no feature cards, no testimonials, no pricing, no footer sections. The canvas is the whole page.",
+    "dom_overlay": "Fixed 100vh 100vw container, pointer-events-none, z-50. Interactive DOM elements get pointer-events-auto.",
+    "scene_flow": [
+      "1. Hero: 3D beverage bottle on a plateau.",
+      "2. Drag: Bottle breaks into spilling liquid particles.",
+      "3. Scroll: Fly through fog.",
+      "4. Drops: 7 floating glass 'ingredient drops' with molecule line art.",
+      "5. Tunnel: Bright circular white-light tunnel zoom.",
+      "6. Platform: Final circular platform, glowing rings, particle figure (bottle morphing into a drop), social links.",
+      "7. Loop back to hero."
+    ]
+  },
+  "motion": {
+    "scroll": "Scroll-driven WebGL using @react-three/drei <ScrollControls> and useScroll hook. Map scroll offset to camera position and scene transitions.",
+    "drag": "Keyboard-accessible spill control + mouse drag mapping using useDrag from @use-gesture/react.",
+    "text": "Text scramble/glitch effects on HUD updates and overlay opens. Use Framer Motion or a custom scramble text hook.",
+    "transitions": "Smooth interpolation (THREE.MathUtils.damp) for camera movement and material property changes.",
+    "accessibility": "Respect prefers-reduced-motion: Provide a static no-WebGL fallback or skip complex camera animations if true."
+  },
+  "accessibility": {
+    "keyboard_navigation": "Spill control must be keyboard accessible (e.g., Arrow keys).",
+    "screen_reader": "Include visually hidden descriptive text for the 3D canvas and scenes.",
+    "motion": "Static fallback or reduced motion for WebGL animations."
+  },
+  "media": {
+    "audio": "Synthesized Web Audio sound. Managed by a global sound toggle (Sound: On/Off).",
+    "textures": "Minimal use. Procedural noise for terrain, pure procedural materials. No heavy stock images."
+  },
+  "3d libraries": {
+    "core": "@react-three/fiber, three",
+    "helpers": "@react-three/drei",
+    "postprocessing": "@react-three/postprocessing",
+    "animation": "framer-motion, gsap (optional, for timeline control if needed)",
+    "interactions": "@use-gesture/react"
+  },
+  "image urls": {
+    "terrain_texture": {
+      "url": "procedural",
+      "description": "Use procedural Three.js noise/displacement for the rocky/snowy terrain. No image URLs needed.",
+      "category": "3d_material"
+    }
+  },
+  "component_path": "/app/src/components",
+  "instructions_to_main_agent": [
+    "Install required dependencies: yarn add three @react-three/fiber @react-three/drei @react-three/postprocessing framer-motion @use-gesture/react lucide-react",
+    "Set up the main App.js as a fullscreen fixed wrapper containing the <Canvas> and the HTML <HUD> overlay.",
+    "Use <ScrollControls> from @react-three/drei to drive the entire experience. Map the scroll offset (0 to 1) to the camera's Z/Y position and rotation to fly through the scenes.",
+    "TERRAIN: Create a wide 3D mountain landscape. Layered snowy and rocky mountains. Use THREE.PlaneGeometry with displacement or basic sculpted meshes. Lighting: soft diffused sunlight from a low angle, bright overcast sky, subtle volumetric light. Add `<fog attach=\"fog\" args={['#DFE4EA', 10, 50]} />`.",
+    "BOTTLE & DROPS: Use `<MeshTransmissionMaterial>` from drei for the glass. The liquid inside is the ONLY place where accent colors (#2E8BFF or #E91E5A) are used.",
+    "PARTICLES: Use `<Sparkles>` or a custom `<points>` system for the dragging/spilling liquid effect, and the final particle figure.",
+    "OVERLAYS & ROUTING: When an ingredient drop is clicked, show an HTML overlay over the canvas (bg-[#E9EDF2]/90 backdrop-blur), update the URL to `/ingredient/[name]` using window.history.pushState without unmounting the canvas.",
+    "HUD: Pure React DOM overlay. Use Space Mono. Elements: Logo top-left, `//// Copyright 2026...` top-right, `Scroll down` bottom-left, etc. Apply text scramble effects using Framer Motion when labels change.",
+    "Ensure the post-processing pipeline uses Bloom, Noise (film grain), and DepthOfField.",
+    "All interactive DOM elements MUST include `data-testid` attributes."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "Do not use dark colors as gradients. Stick strictly to the #E9EDF2 -> #C9D1DA light theme range.",
+    "Don't make generic centered layouts. The HUD must sit at the absolute edges of the screen with precise padding (e.g., p-8).",
+    "Use glass-morphism effects with backdrop filters for DOM overlays (bg-white/40 backdrop-blur-lg).",
+    "Create depth through layered design elements (Canvas at z-0, Post-processing at z-10, HUD at z-50).",
+    "Never use AI assistant Emoji characters (🤖🧠💭).",
+    "Ensure all DOM transitions use Framer Motion or specific CSS transitions (excluding transform).",
+    "CRITICAL: Do not use complete transparent background for overlays. Always use a tint with backdrop-blur to maintain text readability."
+  ],
+  "GENERAL UI UX DESIGN GUIDELINES": [
+    "All interactive and key informational elements MUST include a `data-testid` attribute (e.g., `data-testid=\"sound-toggle\"`, `data-testid=\"close-overlay\"`).",
+    "Ensure text contrast ratios meet WCAG AA standards. The dark slate text (#1B2330) against the light grey world (#E9EDF2) achieves excellent contrast.",
+    "Implement focus states for keyboard navigation on the 'Sound: On/Off' and Overlay Close buttons.",
+    "For the text scramble effect, ensure it settles on readable text quickly (under 800ms) to prevent cognitive overload."
+  ]
+}
